@@ -19,13 +19,15 @@ import javax.jws.WebService;
  */
 @WebService(serviceName = "Service")
 public class Service {
+    
+    private Firebase ref = new Firebase("https://simpleblog5.firebaseio.com/");
 
     /**
      * addPost web service operation
      */
     @WebMethod(operationName = "addPost")
     public boolean addPost(@WebParam(name = "judul") String judul, @WebParam(name = "konten") String konten, @WebParam(name = "tanggal") String tanggal, @WebParam(name = "author") String author) {
-        Firebase postReference = new Firebase("https://simpleblog5.firebaseio.com/post");
+        Firebase postReference = ref.child("post");
         Map<String, String> post = new HashMap<String, String>();
         
         post.put("judul", judul);
@@ -50,8 +52,15 @@ public class Service {
      * editPost web service operation
      */
     @WebMethod(operationName = "editPost")
-    public String editPost(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
+    public boolean editPost(@WebParam(name = "id") String id, @WebParam(name = "judul") String judul, @WebParam(name = "konten") String konten) {
+        Firebase postReference = ref.child("post/" + id);
+        Map<String, Object> updatedPost = new HashMap<String, Object>();
+        
+        updatedPost.put("judul", judul);
+        updatedPost.put("konten", konten);
+        
+        postReference.updateChildren(updatedPost);
+        return true;
     }
     
     /**
