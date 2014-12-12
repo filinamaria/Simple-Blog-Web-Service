@@ -14,6 +14,8 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 import java.util.Date;
 import java.util.Calendar;
+import Database.*;
+
 /**
  *
  * @author Sakurai
@@ -78,16 +80,32 @@ public class Service {
      * publishPost web service operation
      */
     @WebMethod(operationName = "publishPost")
-    public String publishPost(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
+    public boolean publishPost(@WebParam(name = "id") String id) {
+        Firebase postReference = ref.child("post/" + id);
+        Map<String, Object> updatedPost = new HashMap<String, Object>();
+        
+        updatedPost.put("status", "published");
+        
+        postReference.updateChildren(updatedPost);
+        return true;
     }
     
     /**
      * addUser web service operation
      */
     @WebMethod(operationName = "addUser")
-    public String addUser(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
+    public boolean addUser(@WebParam(name = "username") String username, @WebParam(name = "password") String password, @WebParam(name = "nama") String nama, @WebParam(name = "email") String email, @WebParam(name = "role") String role) {
+        Firebase userReference = ref.child("user");
+        Map<String, String> newUser = new HashMap<String, String>();
+        
+        newUser.put("username", username);
+        newUser.put("password", password);
+        newUser.put("nama", nama);
+        newUser.put("email", email);
+        newUser.put("role", role);
+        
+        userReference.push().setValue(newUser);
+        return true;
     }
     
     /**
@@ -142,14 +160,6 @@ public class Service {
      */
     @WebMethod(operationName = "listComment")
     public String listComment(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
-    }
-    
-    /**
-     * deleteComment web service operation
-     */
-    @WebMethod(operationName = "deleteComment")
-    public String deleteComment(@WebParam(name = "name") String txt) {
         return "Hello " + txt + " !";
     }
     
