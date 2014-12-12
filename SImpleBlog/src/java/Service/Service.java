@@ -67,8 +67,10 @@ public class Service {
      * deletePost web service operation
      */
     @WebMethod(operationName = "deletePost")
-    public String deletePost(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
+    public boolean deletePost(@WebParam(name = "id") String id) {
+        Firebase postReference = ref.child("post/" + id);
+        postReference.removeValue();
+        return true;
     }
     
     /**
