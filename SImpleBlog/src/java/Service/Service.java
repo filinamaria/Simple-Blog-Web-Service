@@ -12,7 +12,8 @@ import java.util.Map;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
-
+import java.util.Date;
+import java.util.Calendar;
 /**
  *
  * @author Sakurai
@@ -21,7 +22,7 @@ import javax.jws.WebService;
 public class Service {
     
     private Firebase ref = new Firebase("https://simpleblog5.firebaseio.com/");
-
+    private Firebase refpost = new Firebase("https://simpleblog5.firebaseio.com/post/");
     /**
      * addPost web service operation
      */
@@ -117,8 +118,23 @@ public class Service {
      * addComment web service operation
      */
     @WebMethod(operationName = "addComment")
-    public String addComment(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
+    public String addComment(@WebParam(name = "id") String id,@WebParam(name="nama") String nama,@WebParam(name="email") String email,@WebParam(name="komentar") String komentar) {
+        Firebase postReference = refpost.child("/"+id+"/komentar");
+        Map<String, String> komenkomentar = new HashMap<String, String>();
+        Date date = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+        String tanggal = day+"-"+month+"-"+year;
+        komenkomentar.put("nama", nama);
+        komenkomentar.put("email", email);
+        komenkomentar.put("tanggal",tanggal);
+        komenkomentar.put("komentar", komentar);
+        
+        postReference.push().setValue(komenkomentar);
+        return "Hello Success!";
     }
     
     /**
