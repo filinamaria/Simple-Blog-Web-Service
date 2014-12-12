@@ -77,8 +77,14 @@ public class Service {
      * publishPost web service operation
      */
     @WebMethod(operationName = "publishPost")
-    public String publishPost(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
+    public boolean publishPost(@WebParam(name = "id") String id) {
+        Firebase postReference = ref.child("post/" + id);
+        Map<String, Object> updatedPost = new HashMap<String, Object>();
+        
+        updatedPost.put("status", "published");
+        
+        postReference.updateChildren(updatedPost);
+        return true;
     }
     
     /**
