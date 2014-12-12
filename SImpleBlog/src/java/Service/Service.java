@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
+import Database.*;
 
 /**
  *
@@ -91,8 +92,18 @@ public class Service {
      * addUser web service operation
      */
     @WebMethod(operationName = "addUser")
-    public String addUser(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
+    public boolean addUser(@WebParam(name = "username") String username, @WebParam(name = "password") String password, @WebParam(name = "nama") String nama, @WebParam(name = "email") String email, @WebParam(name = "role") String role) {
+        Firebase userReference = ref.child("user");
+        Map<String, String> newUser = new HashMap<String, String>();
+        
+        newUser.put("username", username);
+        newUser.put("password", password);
+        newUser.put("nama", nama);
+        newUser.put("email", email);
+        newUser.put("role", role);
+        
+        userReference.push().setValue(newUser);
+        return true;
     }
     
     /**
@@ -132,14 +143,6 @@ public class Service {
      */
     @WebMethod(operationName = "listComment")
     public String listComment(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
-    }
-    
-    /**
-     * deleteComment web service operation
-     */
-    @WebMethod(operationName = "deleteComment")
-    public String deleteComment(@WebParam(name = "name") String txt) {
         return "Hello " + txt + " !";
     }
     
