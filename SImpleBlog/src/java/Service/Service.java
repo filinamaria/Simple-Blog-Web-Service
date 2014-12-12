@@ -145,8 +145,10 @@ public class Service {
      * deleteUser web service operation
      */
     @WebMethod(operationName = "deleteUser")
-    public String deleteUser(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
+    public boolean deleteUser(@WebParam(name = "userId") String userId) {
+        Firebase userReference = ref.child("user/" + userId);
+        userReference.removeValue();
+        return true;
     }
     
     /**
