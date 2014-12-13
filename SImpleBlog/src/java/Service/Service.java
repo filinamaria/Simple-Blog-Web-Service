@@ -15,6 +15,7 @@ import javax.jws.WebService;
 import java.util.Date;
 import java.util.Calendar;
 import Database.*;
+import static java.lang.System.console;
 
 /**
  *
@@ -25,6 +26,7 @@ public class Service {
     
     private Firebase ref = new Firebase("https://simpleblog5.firebaseio.com/");
     private Firebase refpost = new Firebase("https://simpleblog5.firebaseio.com/post/");
+    private String var = "asdfasdfasdf";
     /**
      * addPost web service operation
      */
@@ -167,7 +169,24 @@ public class Service {
      * search web service operation
      */
     @WebMethod(operationName = "search")
-    public String search(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
+    public String search(@WebParam(name = "id") String id) {
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                //System.out.println(snapshot.getValue());
+                var = snapshot.getValue().toString();
+                var = postResults(var);
+                System.out.println("finish");
+            }
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        });
+        System.out.println("EXIT");
+        return var+" PING";
+    }
+    public String postResults(String data){
+        return data;
     }
 }
