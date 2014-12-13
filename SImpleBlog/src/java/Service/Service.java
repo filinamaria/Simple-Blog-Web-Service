@@ -45,6 +45,7 @@ import static java.lang.System.console;
  */
 @WebService(serviceName = "Service")
 public class Service {
+    private static String postId;
     
     private Firebase ref = new Firebase("https://simpleblog5.firebaseio.com/");
     private Firebase refpost = new Firebase("https://simpleblog5.firebaseio.com/post/");
@@ -259,8 +260,24 @@ public class Service {
      * listComment web service operation
      */
     @WebMethod(operationName = "listComment")
-    public String listComment(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
+    public List<Comment> listComment(@WebParam(name = "postId") String postId) throws Exception {
+        String jsonString = readUrl("https://simpleblog5.firebaseio.com/post/" + postId + "/komentar.json");
+        List<Comment> comments = new ArrayList<>();
+        
+        if(!jsonString.equals("null")){
+            HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
+        
+            for(String key: result.keySet()){
+                Comment comment = new Comment();
+                comment.setName(result.get(key).get("nama"));
+                comment.setEmail(result.get(key).get("email"));
+                comment.setDate(result.get(key).get("tanggal"));
+                comment.setComment(result.get(key).get("komentar"));
+                comments.add(comment);
+            }
+        }
+        
+        return comments;
     }
     
     /**
@@ -284,6 +301,7 @@ public class Service {
         System.out.println("EXIT");
         return var+" PING";
     }
+    
     public String postResults(String data){
         return data;
     }
@@ -305,5 +323,5 @@ public class Service {
                 reader.close();
         }
     }
-    
+        
 }
