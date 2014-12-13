@@ -70,15 +70,16 @@ public class Service {
         HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
 
         for(String key: result.keySet()){
-            Post post = new Post();
-            post.setId(key);
-            post.setJudul(result.get(key).get("judul"));
-            post.setContent(result.get(key).get("konten"));
-            post.setTanggal(result.get(key).get("tanggal"));
-            post.setAuthor(result.get(key).get("tanggal"));
-            post.setStatus(result.get(key).get("status"));
-            if(result.get(key).get("status").equals(status))
+            if(result.get(key).get("status").equals(status)){
+                Post post = new Post();
+                post.setId(key);
+                post.setJudul(result.get(key).get("judul"));
+                post.setContent(result.get(key).get("konten"));
+                post.setTanggal(result.get(key).get("tanggal"));
+                post.setAuthor(result.get(key).get("tanggal"));
+                post.setStatus(result.get(key).get("status"));
                 posts.add(post);
+            }
         }
         
         return posts;
