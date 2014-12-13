@@ -6,12 +6,34 @@
 
 package Service;
 
+import Database.*;
+
 import com.firebase.client.*;
+import com.firebase.client.snapshot.Node;
+import com.shaded.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
 import java.util.Date;
 import java.util.Calendar;
 import Database.*;
@@ -23,6 +45,7 @@ import static java.lang.System.console;
  */
 @WebService(serviceName = "Service")
 public class Service {
+    private static String postId;
     
     private Firebase ref = new Firebase("https://simpleblog5.firebaseio.com/");
     private Firebase refpost = new Firebase("https://simpleblog5.firebaseio.com/post/");
@@ -49,8 +72,26 @@ public class Service {
      * listPost web service operation
      */
     @WebMethod(operationName = "listPost")
-    public String listPost(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
+    public List<Post> listPost(@WebParam(name = "status") String status) throws Exception {
+        String jsonString = readUrl("https://simpleblog5.firebaseio.com/post.json");
+        List<Post> posts = new ArrayList<>();
+        
+        HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
+
+        for(String key: result.keySet()){
+            if(result.get(key).get("status").equals(status)){
+                Post post = new Post();
+                post.setId(key);
+                post.setJudul(result.get(key).get("judul"));
+                post.setContent(result.get(key).get("konten"));
+                post.setTanggal(result.get(key).get("tanggal"));
+                post.setAuthor(result.get(key).get("tanggal"));
+                post.setStatus(result.get(key).get("status"));
+                posts.add(post);
+            }
+        }
+        
+        return posts;
     }
     
     /**
@@ -73,7 +114,7 @@ public class Service {
      */
     @WebMethod(operationName = "deletePost")
     public boolean deletePost(@WebParam(name = "postId") String postId) {
-        Firebase postReference = ref.child("post/" + postId);
+        Firebase postReference = ref.child("post/" + postId);       
         postReference.removeValue();
         return true;
     }
@@ -89,6 +130,7 @@ public class Service {
         updatedPost.put("status", "published");
         
         postReference.updateChildren(updatedPost);
+        
         return true;
     }
     
@@ -114,8 +156,23 @@ public class Service {
      * listUser web service operation
      */
     @WebMethod(operationName = "listUser")
-    public String listUser(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
+    public List<User> listUser() throws Exception {
+        String jsonString = readUrl("https://simpleblog5.firebaseio.com/user.json");
+        List<User> users = new ArrayList<>();
+        
+        HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
+
+        for(String key: result.keySet()){
+            User user = new User();
+            user.setUsername(result.get(key).get("username"));
+            user.setPassword(result.get(key).get("password"));
+            user.setName(result.get(key).get("nama"));
+            user.setEmail(result.get(key).get("email"));
+            user.setRole(result.get(key).get("role"));
+            users.add(user);
+        }
+        
+        return users;
     }
     
     /**
@@ -147,9 +204,32 @@ public class Service {
      * deleteUser web service operation
      */
     @WebMethod(operationName = "deleteUser")
-    public boolean deleteUser(@WebParam(name = "userId") String userId) {
-        Firebase userReference = ref.child("user/" + userId);
-        userReference.removeValue();
+    public boolean deleteUser(@WebParam(name = "username") String username) throws Exception {
+        // delete user based on username
+        String userJsonString = readUrl("https://simpleblog5.firebaseio.com/user.json");
+        
+        HashMap<String, Map<String, String>> userMap = new ObjectMapper().readValue(userJsonString, HashMap.class);
+        
+        for(String key: userMap.keySet()){
+            if(userMap.get(key).get("username").equals(username)){
+                Firebase userReference = ref.child("user/" + key);
+                
+                userReference.removeValue();
+            }
+        }
+        
+        // detele corresponding user's posts
+        String postJsonString = readUrl("https://simpleblog5.firebaseio.com/post.json");
+               
+        HashMap<String, Map<String, String>> postMap = new ObjectMapper().readValue(postJsonString, HashMap.class);
+
+        for(String key: postMap.keySet()){
+            if(postMap.get(key).get("author").equals(username)){
+                Firebase postReference = ref.child("post/" + key);
+                postReference.removeValue();
+            }
+        }
+        
         return true;
     }
     
@@ -180,8 +260,24 @@ public class Service {
      * listComment web service operation
      */
     @WebMethod(operationName = "listComment")
-    public String listComment(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
+    public List<Comment> listComment(@WebParam(name = "postId") String postId) throws Exception {
+        String jsonString = readUrl("https://simpleblog5.firebaseio.com/post/" + postId + "/komentar.json");
+        List<Comment> comments = new ArrayList<>();
+        
+        if(!jsonString.equals("null")){
+            HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
+        
+            for(String key: result.keySet()){
+                Comment comment = new Comment();
+                comment.setName(result.get(key).get("nama"));
+                comment.setEmail(result.get(key).get("email"));
+                comment.setDate(result.get(key).get("tanggal"));
+                comment.setComment(result.get(key).get("komentar"));
+                comments.add(comment);
+            }
+        }
+        
+        return comments;
     }
     
     /**
@@ -205,7 +301,27 @@ public class Service {
         System.out.println("EXIT");
         return var+" PING";
     }
+    
     public String postResults(String data){
         return data;
     }
+    
+    private static String readUrl(String urlString) throws Exception {
+        BufferedReader reader = null;
+        try {
+            URL url = new URL(urlString);
+            reader = new BufferedReader(new InputStreamReader(url.openStream()));
+            StringBuffer buffer = new StringBuffer();
+            int read;
+            char[] chars = new char[1024];
+            while ((read = reader.read(chars)) != -1)
+                buffer.append(chars, 0, read); 
+
+            return buffer.toString();
+        } finally {
+            if (reader != null)
+                reader.close();
+        }
+    }
+        
 }
