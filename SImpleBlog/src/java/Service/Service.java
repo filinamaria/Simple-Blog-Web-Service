@@ -11,6 +11,7 @@ import Database.*;
 import com.firebase.client.*;
 import com.firebase.client.snapshot.Node;
 import com.shaded.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -24,6 +25,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
@@ -153,8 +155,23 @@ public class Service {
      * listUser web service operation
      */
     @WebMethod(operationName = "listUser")
-    public String listUser(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
+    public List<User> listUser() throws Exception {
+        String jsonString = readUrl("https://simpleblog5.firebaseio.com/user.json");
+        List<User> users = new ArrayList<>();
+        
+        HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
+
+        for(String key: result.keySet()){
+            User user = new User();
+            user.setUsername(result.get(key).get("username"));
+            user.setPassword(result.get(key).get("password"));
+            user.setName(result.get(key).get("nama"));
+            user.setEmail(result.get(key).get("email"));
+            user.setRole(result.get(key).get("role"));
+            users.add(user);
+        }
+        
+        return users;
     }
     
     /**
@@ -288,4 +305,5 @@ public class Service {
                 reader.close();
         }
     }
+    
 }
