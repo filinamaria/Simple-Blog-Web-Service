@@ -110,7 +110,7 @@ public class PostingDatabase {
 
           while(rs.next()){
               Post post = new Post();
-              post.setId(rs.getInt(1));
+              post.setId(rs.getString(1));
               post.setJudul(rs.getString(2));
               post.setTanggal(rs.getString(3));
               post.setContent(rs.getString(4));
@@ -137,7 +137,7 @@ public class PostingDatabase {
 
           while(rs.next()){
               Post post = new Post();
-              post.setId(rs.getInt(1));
+              post.setId(rs.getString(1));
               post.setJudul(rs.getString(2));
               post.setTanggal(rs.getString(3));
               post.setContent(rs.getString(4));
@@ -560,7 +560,7 @@ public class PostingDatabase {
 
         while(rs.next()){
             Post post = new Post();
-            post.setId(rs.getInt(1));
+            post.setId(rs.getString(1));
             post.setJudul(rs.getString(2));
             post.setTanggal(rs.getString(3));
             post.setContent(rs.getString(4));

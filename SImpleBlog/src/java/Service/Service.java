@@ -6,15 +6,31 @@
 
 package Service;
 
+import Database.*;
+
 import com.firebase.client.*;
+import com.firebase.client.snapshot.Node;
+import com.shaded.fasterxml.jackson.databind.ObjectMapper;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
-import java.util.Date;
-import java.util.Calendar;
-import Database.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
 
 /**
  *
@@ -47,8 +63,25 @@ public class Service {
      * listPost web service operation
      */
     @WebMethod(operationName = "listPost")
-    public String listPost(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
+    public List<Post> listPost(@WebParam(name = "status") String status) throws Exception {
+        String jsonString = readUrl("https://simpleblog5.firebaseio.com/post.json");
+        List<Post> posts = new ArrayList<>();
+        
+        HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
+
+        for(String key: result.keySet()){
+            Post post = new Post();
+            post.setId(key);
+            post.setJudul(result.get(key).get("judul"));
+            post.setContent(result.get(key).get("konten"));
+            post.setTanggal(result.get(key).get("tanggal"));
+            post.setAuthor(result.get(key).get("tanggal"));
+            post.setStatus(result.get(key).get("status"));
+            if(result.get(key).get("status").equals(status))
+                posts.add(post);
+        }
+        
+        return posts;
     }
     
     /**
@@ -72,6 +105,8 @@ public class Service {
     @WebMethod(operationName = "deletePost")
     public boolean deletePost(@WebParam(name = "postId") String postId) {
         Firebase postReference = ref.child("post/" + postId);
+        
+
         postReference.removeValue();
         return true;
     }
@@ -87,6 +122,7 @@ public class Service {
         updatedPost.put("status", "published");
         
         postReference.updateChildren(updatedPost);
+        
         return true;
     }
     
@@ -188,5 +224,23 @@ public class Service {
     @WebMethod(operationName = "search")
     public String search(@WebParam(name = "name") String txt) {
         return "Hello " + txt + " !";
+    }
+    
+    private static String readUrl(String urlString) throws Exception {
+        BufferedReader reader = null;
+        try {
+            URL url = new URL(urlString);
+            reader = new BufferedReader(new InputStreamReader(url.openStream()));
+            StringBuffer buffer = new StringBuffer();
+            int read;
+            char[] chars = new char[1024];
+            while ((read = reader.read(chars)) != -1)
+                buffer.append(chars, 0, read); 
+
+            return buffer.toString();
+        } finally {
+            if (reader != null)
+                reader.close();
+        }
     }
 }

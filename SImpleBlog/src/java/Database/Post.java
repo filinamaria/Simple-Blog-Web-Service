@@ -11,7 +11,7 @@ package Database;
  * @author Rikysamuel
  */
 public class Post {
-    int Id;
+    String Id;
     String Judul;
     String Tanggal;
     String Content;
@@ -21,11 +21,11 @@ public class Post {
     public Post(){
     }
     
-    public void setId(int Id) {
+    public void setId(String Id) {
         this.Id = Id;
     }
 
-    public int getId() {
+    public String getId() {
         return Id;
     }
 

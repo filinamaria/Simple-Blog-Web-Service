@@ -51,7 +51,7 @@ public class PublishPost {
             
             while(result.next()){
                 Post post = new Post();
-                post.setId(result.getInt(1));
+                post.setId(result.getString(1));
                 post.setJudul(result.getString(2));
                 post.setTanggal(result.getString(3));
                 post.setContent(result.getString(4));
@@ -74,7 +74,7 @@ public class PublishPost {
                 
                 while(result.next()){
                     Post post = new Post();
-                    post.setId(result.getInt(1));
+                    post.setId(result.getString(1));
                     post.setJudul(result.getString(2));
                     post.setTanggal(result.getString(3));
                     post.setContent(result.getString(4));

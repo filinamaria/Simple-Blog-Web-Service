@@ -67,7 +67,7 @@ public class ViewPost {
             String query = "Select * From post where ID = " + PostID + ";";
             result = stmt.executeQuery(query);
             while(result.next()){
-              post.setId(result.getInt(1));
+              post.setId(result.getString(1));
               post.setJudul(result.getString(2));
               post.setTanggal(result.getString(3));
               post.setContent(result.getString(4));
