@@ -111,9 +111,7 @@ public class Service {
      */
     @WebMethod(operationName = "deletePost")
     public boolean deletePost(@WebParam(name = "postId") String postId) {
-        Firebase postReference = ref.child("post/" + postId);
-        
-        
+        Firebase postReference = ref.child("post/" + postId);       
         postReference.removeValue();
         return true;
     }
@@ -188,9 +186,32 @@ public class Service {
      * deleteUser web service operation
      */
     @WebMethod(operationName = "deleteUser")
-    public boolean deleteUser(@WebParam(name = "userId") String userId) {
-        Firebase userReference = ref.child("user/" + userId);
-        userReference.removeValue();
+    public boolean deleteUser(@WebParam(name = "username") String username) throws Exception {
+        // delete user based on username
+        String userJsonString = readUrl("https://simpleblog5.firebaseio.com/user.json");
+        
+        HashMap<String, Map<String, String>> userMap = new ObjectMapper().readValue(userJsonString, HashMap.class);
+        
+        for(String key: userMap.keySet()){
+            if(userMap.get(key).get("username").equals(username)){
+                Firebase userReference = ref.child("user/" + key);
+                
+                userReference.removeValue();
+            }
+        }
+        
+        // detele corresponding user's posts
+        String postJsonString = readUrl("https://simpleblog5.firebaseio.com/post.json");
+               
+        HashMap<String, Map<String, String>> postMap = new ObjectMapper().readValue(postJsonString, HashMap.class);
+
+        for(String key: postMap.keySet()){
+            if(postMap.get(key).get("author").equals(username)){
+                Firebase postReference = ref.child("post/" + key);
+                postReference.removeValue();
+            }
+        }
+        
         return true;
     }
     
