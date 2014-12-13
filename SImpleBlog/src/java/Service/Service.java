@@ -57,8 +57,8 @@ public class Service {
      * editPost web service operation
      */
     @WebMethod(operationName = "editPost")
-    public boolean editPost(@WebParam(name = "id") String id, @WebParam(name = "judul") String judul, @WebParam(name = "konten") String konten) {
-        Firebase postReference = ref.child("post/" + id);
+    public boolean editPost(@WebParam(name = "postId") String postId, @WebParam(name = "judul") String judul, @WebParam(name = "konten") String konten) {
+        Firebase postReference = ref.child("post/" + postId);
         Map<String, Object> updatedPost = new HashMap<String, Object>();
         
         updatedPost.put("judul", judul);
@@ -72,8 +72,8 @@ public class Service {
      * deletePost web service operation
      */
     @WebMethod(operationName = "deletePost")
-    public boolean deletePost(@WebParam(name = "id") String id) {
-        Firebase postReference = ref.child("post/" + id);
+    public boolean deletePost(@WebParam(name = "postId") String postId) {
+        Firebase postReference = ref.child("post/" + postId);
         postReference.removeValue();
         return true;
     }
@@ -82,8 +82,8 @@ public class Service {
      * publishPost web service operation
      */
     @WebMethod(operationName = "publishPost")
-    public boolean publishPost(@WebParam(name = "id") String id) {
-        Firebase postReference = ref.child("post/" + id);
+    public boolean publishPost(@WebParam(name = "postId") String postId) {
+        Firebase postReference = ref.child("post/" + postId);
         Map<String, Object> updatedPost = new HashMap<String, Object>();
         
         updatedPost.put("status", "published");
@@ -122,16 +122,35 @@ public class Service {
      * editUser web service operation
      */
     @WebMethod(operationName = "editUser")
-    public String editUser(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
+    public boolean editUser(@WebParam(name = "userId") String userId, @WebParam(name = "password") String password, @WebParam(name = "nama") String nama, @WebParam(name = "email") String email, @WebParam(name = "role") String role) {
+        Firebase userReference = ref.child("user/" + userId);
+        Map<String, Object> updatedUser = new HashMap<String, Object>();
+        
+        if(password != null){
+            updatedUser.put("password", password);
+        }
+        if(nama != null){
+            updatedUser.put("nama", nama);
+        }
+        if(email != null){
+            updatedUser.put("email", email);
+        }
+        if(role != null){
+            updatedUser.put("role", role);
+        }
+        
+        userReference.updateChildren(updatedUser);
+        return true;
     }
     
     /**
      * deleteUser web service operation
      */
     @WebMethod(operationName = "deleteUser")
-    public String deleteUser(@WebParam(name = "name") String txt) {
-        return "Hello " + txt + " !";
+    public boolean deleteUser(@WebParam(name = "userId") String userId) {
+        Firebase userReference = ref.child("user/" + userId);
+        userReference.removeValue();
+        return true;
     }
     
     /**
