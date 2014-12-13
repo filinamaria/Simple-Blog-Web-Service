@@ -107,7 +107,7 @@ public class Service {
     public boolean deletePost(@WebParam(name = "postId") String postId) {
         Firebase postReference = ref.child("post/" + postId);
         
-
+        
         postReference.removeValue();
         return true;
     }
