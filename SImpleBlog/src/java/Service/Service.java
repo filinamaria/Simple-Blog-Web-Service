@@ -312,6 +312,30 @@ public class Service {
         return posts;
     }
     
+    /**
+     *
+     * @param katakunci
+     * @param katakunci
+     * @return
+     * @throws Exception
+     */
+    public boolean login(@WebParam(name = "username") String username,@WebParam(name = "password") String password) throws Exception {
+        String jsonString = readUrl("https://simpleblog5.firebaseio.com/user.json");
+        boolean isfound = false;
+        HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
+
+        for(String key: result.keySet()){
+            if(result.get(key).get("username").equals(username) && result.get(key).get("password").equals(password)){
+                String user = result.get(key).get("username");
+                String pswd = result.get(key).get("password");
+                isfound = true;
+                break;
+            }
+        }
+        
+        return isfound;
+    }
+    
     private static String readUrl(String urlString) throws Exception {
         BufferedReader reader = null;
         try {
