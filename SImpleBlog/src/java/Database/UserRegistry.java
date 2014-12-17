@@ -7,10 +7,8 @@
 package Database;
 
 import java.io.IOException;
-import static java.lang.System.out;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -19,6 +17,9 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.ws.WebServiceRef;
+import service.Exception_Exception;
+import service.Service_Service;
 
 /**
  *
@@ -27,6 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 @ManagedBean(name = "UserRegistry", eager = true)
 @ViewScoped
 public class UserRegistry {
+    @WebServiceRef(wsdlLocation = "WEB-INF/wsdl/intense-shore-8980.herokuapp.com/HelloService.wsdl")
+    private Service_Service service;
     
     public UserRegistry(){
 
@@ -67,28 +70,22 @@ public class UserRegistry {
         return userExist;
     }
     
-    public void addUserOwner() throws ClassNotFoundException, SQLException, IllegalAccessException, IOException{
+    public void addUserOwner() throws ClassNotFoundException, SQLException, IllegalAccessException, IOException, Exception_Exception{
         HttpServletRequest request = (HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
         String Username = request.getParameter("Form:Username");
         String Password = request.getParameter("Form:Password");
         String Email = request.getParameter("Form:Email");
         String Name = request.getParameter("Form:Name");
-        out.println("password: " + Password);
-        if(!isUserExist(Username)){
-            try (Connection con = getConnection()) {
-                PreparedStatement ps;
-                String query = "INSERT INTO `user` (`Username`,`Password`, `Name`, `email`, `Role`) VALUES (?,?,?,?,?)";
-                ps= con.prepareStatement(query);
-                ps.setString(1,Username);
-                ps.setString(2,Password);
-                ps.setString(3,Name);
-                ps.setString(4,Email);
-                ps.setString(5,"Owner");
-                int i = ps.executeUpdate();
-                con.close();
-            }
-        }
+        addUser(Username, Password, Name, Email, "owner");
         ExternalContext extcon = FacesContext.getCurrentInstance().getExternalContext();
         extcon.redirect("/SImpleBlog/Home.xhtml");
     }
+
+    private boolean addUser(java.lang.String username, java.lang.String password, java.lang.String nama, java.lang.String email, java.lang.String role) throws Exception_Exception {
+        // Note that the injected javax.xml.ws.Service reference as well as port objects are not thread safe.
+        // If the calling of port operations may lead to race condition some synchronization is required.
+        service.Service port = service.getServicePort();
+        return port.addUser(username, password, nama, email, role);
+    }
+    
 }

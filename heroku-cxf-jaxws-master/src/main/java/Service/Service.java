@@ -138,18 +138,29 @@ public class Service {
      * addUser web service operation
      */
     @WebMethod(operationName = "addUser")
-    public boolean addUser(@WebParam(name = "username") String username, @WebParam(name = "password") String password, @WebParam(name = "nama") String nama, @WebParam(name = "email") String email, @WebParam(name = "role") String role) {
+    public boolean addUser(@WebParam(name = "username") String username, @WebParam(name = "password") String password, @WebParam(name = "nama") String nama, @WebParam(name = "email") String email, @WebParam(name = "role") String role) throws Exception {
         Firebase userReference = ref.child("user");
-        Map<String, String> newUser = new HashMap<String, String>();
-        
-        newUser.put("username", username);
-        newUser.put("password", password);
-        newUser.put("nama", nama);
-        newUser.put("email", email);
-        newUser.put("role", role);
-        
-        userReference.push().setValue(newUser);
-        return true;
+        String jsonString = readUrl("https://simpleblog5.firebaseio.com/user.json");
+        boolean Success = true;
+        HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
+ 
+        for(String key: result.keySet()){
+            if(result.get(key).get("username").equals(username)){
+                // Username telah ada di database
+                Success = false;
+                break;
+            }  
+        }
+        if(Success){
+            Map<String, String> newUser = new HashMap<String, String>();
+            newUser.put("username", username);
+            newUser.put("password", password);
+            newUser.put("nama", nama);
+            newUser.put("email", email);
+            newUser.put("role", role);
+            userReference.push().setValue(newUser);
+        }
+        return Success;
     }
     
     /**
@@ -322,6 +333,23 @@ public class Service {
             if (reader != null)
                 reader.close();
         }
+    }
+    
+      public boolean login(@WebParam(name = "username") String username,@WebParam(name = "password") String password) throws Exception {
+        String jsonString = readUrl("https://simpleblog5.firebaseio.com/user.json");
+        boolean isfound = false;
+        HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
+
+        for(String key: result.keySet()){
+            if(result.get(key).get("username").equals(username) && result.get(key).get("password").equals(password)){
+                String user = result.get(key).get("username");
+                String pswd = result.get(key).get("password");
+                isfound = true;
+                break;
+            }
+        }
+        
+        return isfound;
     }
         
 }

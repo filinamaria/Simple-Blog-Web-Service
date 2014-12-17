@@ -21,6 +21,8 @@
   <xs:element name="listPostResponse" type="tns:listPostResponse"/>
   <xs:element name="listUser" type="tns:listUser"/>
   <xs:element name="listUserResponse" type="tns:listUserResponse"/>
+  <xs:element name="login" type="tns:login"/>
+  <xs:element name="loginResponse" type="tns:loginResponse"/>
   <xs:element name="postResults" type="tns:postResults"/>
   <xs:element name="postResultsResponse" type="tns:postResultsResponse"/>
   <xs:element name="publishPost" type="tns:publishPost"/>
@@ -72,6 +74,17 @@
       <xs:element minOccurs="0" name="judul" type="xs:string"/>
       <xs:element minOccurs="0" name="status" type="xs:string"/>
       <xs:element minOccurs="0" name="tanggal" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="login">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="username" type="xs:string"/>
+      <xs:element minOccurs="0" name="password" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="loginResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:boolean"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="deletePost">
@@ -222,6 +235,10 @@
     <wsdl:part element="tns:Exception" name="Exception">
     </wsdl:part>
   </wsdl:message>
+  <wsdl:message name="loginResponse">
+    <wsdl:part element="tns:loginResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
   <wsdl:message name="addCommentResponse">
     <wsdl:part element="tns:addCommentResponse" name="parameters">
     </wsdl:part>
@@ -272,6 +289,10 @@
   </wsdl:message>
   <wsdl:message name="postResultsResponse">
     <wsdl:part element="tns:postResultsResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="login">
+    <wsdl:part element="tns:login" name="parameters">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="deletePost">
@@ -335,6 +356,14 @@
       <wsdl:fault message="tns:Exception" name="Exception">
     </wsdl:fault>
     </wsdl:operation>
+    <wsdl:operation name="login">
+      <wsdl:input message="tns:login" name="login">
+    </wsdl:input>
+      <wsdl:output message="tns:loginResponse" name="loginResponse">
+    </wsdl:output>
+      <wsdl:fault message="tns:Exception" name="Exception">
+    </wsdl:fault>
+    </wsdl:operation>
     <wsdl:operation name="deletePost">
       <wsdl:input message="tns:deletePost" name="deletePost">
     </wsdl:input>
@@ -346,6 +375,8 @@
     </wsdl:input>
       <wsdl:output message="tns:addUserResponse" name="addUserResponse">
     </wsdl:output>
+      <wsdl:fault message="tns:Exception" name="Exception">
+    </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="postResults">
       <wsdl:input message="tns:postResults" name="postResults">
@@ -434,6 +465,18 @@
         <soap:fault name="Exception" use="literal"/>
       </wsdl:fault>
     </wsdl:operation>
+    <wsdl:operation name="login">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="login">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="loginResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="Exception">
+        <soap:fault name="Exception" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
     <wsdl:operation name="deletePost">
       <soap:operation soapAction="" style="document"/>
       <wsdl:input name="deletePost">
@@ -451,6 +494,9 @@
       <wsdl:output name="addUserResponse">
         <soap:body use="literal"/>
       </wsdl:output>
+      <wsdl:fault name="Exception">
+        <soap:fault name="Exception" use="literal"/>
+      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="postResults">
       <soap:operation soapAction="" style="document"/>
@@ -536,7 +582,7 @@
   </wsdl:binding>
   <wsdl:service name="Service">
     <wsdl:port binding="tns:ServiceSoapBinding" name="ServicePort">
-      <soap:address location="http://morning-citadel-5466.herokuapp.com/HelloService"/>
+      <soap:address location="http://intense-shore-8980.herokuapp.com/HelloService"/>
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

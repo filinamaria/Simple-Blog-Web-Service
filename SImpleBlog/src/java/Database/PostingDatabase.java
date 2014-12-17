@@ -157,30 +157,31 @@ public class PostingDatabase {
         String Judul = request.getParameter("Judul");
         String Tanggal = request.getParameter("Tanggal");
         String Konten = request.getParameter("Konten");
-        ResultSet rs;
-        try (Connection con = makeConnection()) {
-            Statement stmt = con.createStatement();
-            String query = "Select COUNT(Id) from post";
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-            java.util.Date parsed = format.parse(Tanggal);
-            java.sql.Date datesql = new java.sql.Date(parsed.getTime());
-            
-            rs = stmt.executeQuery(query);
-            PreparedStatement ps;
-            int countsumId = 0;
-            while(rs.next()){
-                countsumId = rs.getInt(1);
-            }
-            String query2 = "INSERT INTO post (Judul, Tanggal, Content, Author, Status) VALUES (?,?,?,?,?)";
-            ps= con.prepareStatement(query2);
-            ps.setString(1,Judul);
-            ps.setDate(2,datesql);
-            ps.setString(3,Konten);
-            ps.setString(4,login.getUserCookie().getValue());
-            ps.setString(5,"unpublished");
-            int i = ps.executeUpdate();
-            con.close();
-        }
+//        ResultSet rs;
+//        try (Connection con = makeConnection()) {
+//            Statement stmt = con.createStatement();
+//            String query = "Select COUNT(Id) from post";
+//            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+//            java.util.Date parsed = format.parse(Tanggal);
+//            java.sql.Date datesql = new java.sql.Date(parsed.getTime());
+//            
+//            rs = stmt.executeQuery(query);
+//            PreparedStatement ps;
+//            int countsumId = 0;
+//            while(rs.next()){
+//                countsumId = rs.getInt(1);
+//            }
+//            String query2 = "INSERT INTO post (Judul, Tanggal, Content, Author, Status) VALUES (?,?,?,?,?)";
+//            ps= con.prepareStatement(query2);
+//            ps.setString(1,Judul);
+//            ps.setDate(2,datesql);
+//            ps.setString(3,Konten);
+//            ps.setString(4,login.getUserCookie().getValue());
+//            ps.setString(5,"unpublished");
+//            int i = ps.executeUpdate();
+//            con.close();
+//        }
+        
             ExternalContext extcon = FacesContext.getCurrentInstance().getExternalContext();
             extcon.redirect("/SImpleBlog/Home.xhtml");
     }

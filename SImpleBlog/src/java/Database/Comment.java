@@ -7,9 +7,6 @@
 package Database;
 
 import java.util.List;
-import service.Exception_Exception;
-import service.Post;
-import service.*;
 /**
  *
  * @author Sakurai
@@ -72,21 +69,4 @@ public class Comment {
     public String getComment() {
         return comment;
     }
-
-    /**
-     * @param comment the comment to set
-     */
-    public void setComment(String comment) throws Exception_Exception {
-        this.comment = comment;
-        List<Post> listPost = listPost("aaa");
-    }
-
-    private static java.util.List<service.Post> listPost(java.lang.String status) throws Exception_Exception {
-        service.Service_Service service = new service.Service_Service();
-        service.Service port = service.getServicePort();
-        return port.listPost(status);
-    }
-    
-    
-    
 }

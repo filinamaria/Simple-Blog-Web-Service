@@ -45,8 +45,8 @@
     </target>
     <target name="wsimport-client-HelloService" depends="wsimport-init">
         <mkdir dir="${build.generated.dir}/jax-wsCache/HelloService"/>
-        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/HelloService" destdir="${build.generated.dir}/jax-wsCache/HelloService" wsdl="${basedir}/${conf-dir}xml-resources/web-service-references/HelloService/wsdl/morning-citadel-5466.herokuapp.com/HelloService.wsdl" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" fork="false" wsdlLocation="http://morning-citadel-5466.herokuapp.com/HelloService?wsdl" xnocompile="true" xendorsed="true">
-            <depends file="${basedir}/${conf-dir}xml-resources/web-service-references/HelloService/wsdl/morning-citadel-5466.herokuapp.com/HelloService.wsdl"/>
+        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/HelloService" destdir="${build.generated.dir}/jax-wsCache/HelloService" wsdl="${basedir}/${conf-dir}xml-resources/web-service-references/HelloService/wsdl/intense-shore-8980.herokuapp.com/HelloService.wsdl" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" fork="false" wsdlLocation="http://intense-shore-8980.herokuapp.com/HelloService?wsdl" xnocompile="true" xendorsed="true">
+            <depends file="${basedir}/${conf-dir}xml-resources/web-service-references/HelloService/wsdl/intense-shore-8980.herokuapp.com/HelloService.wsdl"/>
             <produces dir="${build.generated.dir}/jax-wsCache/HelloService"/>
         </wsimport>
         <copy todir="${build.generated.sources.dir}/jax-ws">
