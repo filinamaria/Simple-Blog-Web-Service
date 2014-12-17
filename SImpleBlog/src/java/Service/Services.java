@@ -44,7 +44,7 @@ import static java.lang.System.console;
  * @author Sakurai
  */
 @WebService(serviceName = "Service")
-public class Service {
+public class Services {
     private static String postId;
     
     private Firebase ref = new Firebase("https://simpleblog5.firebaseio.com/");

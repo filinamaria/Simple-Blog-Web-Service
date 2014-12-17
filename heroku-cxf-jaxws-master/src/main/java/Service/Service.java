@@ -10,7 +10,7 @@ import Database.*;
 
 import com.firebase.client.*;
 import com.firebase.client.snapshot.Node;
-import com.shaded.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
