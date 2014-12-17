@@ -280,30 +280,60 @@ public class Services {
         return comments;
     }
     
-    /**
-     * search web service operation
-     */
-    @WebMethod(operationName = "search")
-    public String search(@WebParam(name = "id") String id) {
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                //System.out.println(snapshot.getValue());
-                var = snapshot.getValue().toString();
-                var = postResults(var);
-                System.out.println("finish");
-            }
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("The read failed: " + firebaseError.getMessage());
-            }
-        });
-        System.out.println("EXIT");
-        return var+" PING";
-    }
-    
     public String postResults(String data){
         return data;
+    }
+    
+    /**
+     *
+     * @param katakunci
+     * @return
+     * @throws Exception
+     */
+    public List<Post> search(@WebParam(name = "katakunci") String katakunci) throws Exception {
+        String jsonString = readUrl("https://simpleblog5.firebaseio.com/post.json");
+        List<Post> posts = new ArrayList<>();
+        
+        HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
+
+        for(String key: result.keySet()){
+            if(result.get(key).get("judul").equals(katakunci) || result.get(key).get("konten").equals(katakunci)){
+                Post post = new Post();
+                post.setId(key);
+                post.setJudul(result.get(key).get("judul"));
+                post.setContent(result.get(key).get("konten"));
+                post.setTanggal(result.get(key).get("tanggal"));
+                post.setAuthor(result.get(key).get("tanggal"));
+                post.setStatus(result.get(key).get("status"));
+                posts.add(post);
+            }
+        }
+        
+        return posts;
+    }
+    
+    /**
+     *
+     * @param katakunci
+     * @param katakunci
+     * @return
+     * @throws Exception
+     */
+    public boolean login(@WebParam(name = "username") String username,@WebParam(name = "password") String password) throws Exception {
+        String jsonString = readUrl("https://simpleblog5.firebaseio.com/user.json");
+        boolean isfound = false;
+        HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
+
+        for(String key: result.keySet()){
+            if(result.get(key).get("username").equals(username) && result.get(key).get("password").equals(password)){
+                String user = result.get(key).get("username");
+                String pswd = result.get(key).get("password");
+                isfound = true;
+                break;
+            }
+        }
+        
+        return isfound;
     }
     
     private static String readUrl(String urlString) throws Exception {
