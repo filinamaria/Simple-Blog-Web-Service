@@ -7,7 +7,6 @@
 
 function LoadCommentList(PostID){
     var xmlhttp = new XMLHttpRequest();
-
     xmlhttp.open("GET","assets/loadcomments.jsp?ID=" + PostID,true);
     xmlhttp.onreadystatechange=function(){
             if (xmlhttp.readyState==4 && xmlhttp.status==200){
@@ -68,4 +67,8 @@ function IsEmailValidForRegistry(){
     }else{
             return true;	
     }
+}
+
+function test(){
+    alert("asdsadsdasdsad");
 }

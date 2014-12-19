@@ -15,8 +15,16 @@ and open the template in the editor.
         <link type="text/css" rel="stylesheet" href="assets/screen.css"/>
         <script type="text/javascript" src="assets/ajax.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        
+        <script type="text/javascript">
+            function test(){
+                alert("adadasdsad");
+            }
+            
+        </script>
+        
     </head>
-    <h:body class="default" onload="LoadCommentList(#{Viewpost.postId})">
+    <h:body class="default" onload="LoadCommentList('#{Viewpost.postId}')">
         <div class="wrapper">
 
         <nav class="nav">
@@ -51,7 +59,7 @@ and open the template in the editor.
                     <h2>Komentar</h2>
 
                     <div id="contact-area2">
-                        <h:form rendered="#{Posting.loginState == true}" onsubmit="AddCommentLoggedIn(#{Viewpost.postId})">
+                        <h:form rendered="#{Posting.loginState == true}" onsubmit="AddCommentLoggedIn('#{Viewpost.postId}')">
                             <label for="Nama">Nama:</label>
                             <input type="text" name="Nama2" id="Nama2" required="true" disabled="true" value="#{Posting.activeUser}"/>
 
@@ -63,7 +71,7 @@ and open the template in the editor.
                             
                             <h:commandButton type="submit" value="Kirim" class="submit-button"></h:commandButton>
                         </h:form>
-                        <h:form rendered="#{Posting.loginState == false}" id="Form" onsubmit="return AddComment(#{Viewpost.postId})">
+                        <h:form rendered="#{Posting.loginState == false}" id="Form" onsubmit="return AddComment('#{Viewpost.postId}')">
                             <label for="Nama">Nama:</label>
                             <input type="text" name="Nama" id="Nama" required="true"/>
 
