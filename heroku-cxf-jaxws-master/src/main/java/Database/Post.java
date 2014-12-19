@@ -50,7 +50,10 @@ public class Post {
     }
 
     public String getContent() {
-        return Content;
+        if(Content.length() > 300)
+            return Content.substring(0, 300);
+        else
+            return Content;
     }
     
     public String getContentPreview(){
@@ -75,4 +78,10 @@ public class Post {
     public String getStatus() {
         return Status;
     }
+
+    @Override
+    public String toString() {
+        return "Post{" + "Id=" + Id + ", Judul=" + Judul + ", Tanggal=" + Tanggal + ", Content=" + Content + ", Author=" + Author + ", Status=" + Status + '}';
+    }
+    
 }

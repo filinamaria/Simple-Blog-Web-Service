@@ -7,16 +7,15 @@
 package Database;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.ws.WebServiceRef;
+import service.Exception_Exception;
+import service.Service_Service;
 
 /**
  *
@@ -25,79 +24,48 @@ import javax.servlet.http.HttpServletRequest;
 @ManagedBean(name = "Editpost", eager = true)
 @SessionScoped
 public class EditPost {
-    private int PostID;
+    @WebServiceRef(wsdlLocation = "WEB-INF/wsdl/intense-shore-8980.herokuapp.com/HelloService.wsdl")
+    private Service_Service service;
+    private String PostID;
     
     public EditPost(){
         
     }
     
-    public void setPostId(int PostID){
+    public void setPostId(String PostID){
         this.PostID = PostID;
     }
     
-    public void Redirect(int PostID) throws IOException{
+    public void Redirect(String PostID) throws IOException{
         setPostId(PostID);
         ExternalContext extcon = FacesContext.getCurrentInstance().getExternalContext();
         extcon.redirect("/SImpleBlog/EditPost.xhtml");
     }
-    
-    private Connection getConnection() throws ClassNotFoundException, SQLException, IllegalAccessException{
-        Connection conn = null;
-        try{
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
-            String url = "jdbc:mysql://localhost/blog";
-            String user = "root";
-            String password = "";
-            conn =  DriverManager.getConnection(url, user, password);
-        }catch(ClassNotFoundException | InstantiationException e){
-            System.err.println(e);
-        }
-        return conn;
-    }
-    
-    public Post getPost() throws ClassNotFoundException, SQLException, IllegalAccessException{
-        ResultSet result;
-        Post post = new Post();
-        try{
-            try (Connection conn = getConnection()) {
-                Statement stmt = conn.createStatement();
-                String query = "Select * From post where ID = " + PostID + ";";
-                result = stmt.executeQuery(query);
-                while(result.next()){
-                    post.setId(result.getString(1));
-                    post.setJudul(result.getString(2));
-                    post.setTanggal(result.getString(3));
-                    post.setContent(result.getString(4));
-                    post.setAuthor(result.getString(5));
-                    post.setStatus(result.getString(6));
-                }
-            }
-            
-        } catch(SQLException e){
-            System.err.println(e);
-        }
-        
-        return post;
+
+    public service.Post getPost() throws ClassNotFoundException, SQLException, IllegalAccessException, Exception_Exception{
+        return getPost_1(PostID);
     }
     
     public void editPostToDatabase() throws ClassNotFoundException, IllegalAccessException, IOException{
         HttpServletRequest request = (HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
         String Judul = request.getParameter("Judul");
         String Konten = request.getParameter("Konten");
-        
-        ResultSet result;
-        Post post = new Post();
-        try{
-            try (Connection conn = getConnection()) {
-                Statement stmt = conn.createStatement();
-                String query = "Update post set Judul = \"" + Judul + "\", Content = \"" + Konten + "\" where ID = " + PostID + ";";
-                stmt.executeUpdate(query);
-            }
-            
-        } catch(SQLException e){
-            System.err.println(e);
-        }
+        editPost(PostID, Judul, Konten);
         ExternalContext extcon = FacesContext.getCurrentInstance().getExternalContext();
         extcon.redirect("/SImpleBlog/Home.xhtml");
     }    
+
+    private boolean editPost(java.lang.String postId, java.lang.String judul, java.lang.String konten) {
+        // Note that the injected javax.xml.ws.Service reference as well as port objects are not thread safe.
+        // If the calling of port operations may lead to race condition some synchronization is required.
+        service.Service port = service.getServicePort();
+        return port.editPost(postId, judul, konten);
+    }
+
+    private service.Post getPost_1(java.lang.String postid) throws Exception_Exception {
+        // Note that the injected javax.xml.ws.Service reference as well as port objects are not thread safe.
+        // If the calling of port operations may lead to race condition some synchronization is required.
+        service.Service port = service.getServicePort();
+        return port.getPost(postid);
+    }
 }

@@ -39,6 +39,12 @@ and open the template in the editor.
                 <ul id="adminoption">
                     <li>
                         <h:form>
+                            <h:commandButton class="art-list-addpost" value="Search!" action="#{SearchCont.getPost()}"/>
+                            <input type="text" class="art-list-addpost" name="search" id="search"/> &nbsp;
+                        </h:form>
+                    </li>
+                    <li>
+                        <h:form>
                             <h:commandLink class="art-list-addpost" action="PublishPost?faces-redirect=true" value="Unpublished Post">
                             </h:commandLink>
                         </h:form>
@@ -65,7 +71,7 @@ and open the template in the editor.
                         <div class="art-list-time">By #{p.author}</div>
                         <div class="art-list-time">#{p.tanggal}</div>
                     </div>
-                    <p> #{p.contentPreview}&hellip;</p>
+                    <p> #{p.content}&hellip;</p>
                     <p>
                         <h:form styleClass="editbutton">
                             <h:commandLink value="Edit|" action="#{Editpost.Redirect(p.id)}"></h:commandLink>

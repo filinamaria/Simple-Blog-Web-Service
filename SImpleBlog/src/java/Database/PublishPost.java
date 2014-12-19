@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.xml.ws.WebServiceRef;
+import service.Exception_Exception;
+import service.Service_Service;
 
 /**
  *
@@ -23,6 +26,8 @@ import javax.faces.bean.ViewScoped;
 @ManagedBean(name = "Publishpost", eager = true)
 @ViewScoped
 public class PublishPost {          
+    @WebServiceRef(wsdlLocation = "WEB-INF/wsdl/intense-shore-8980.herokuapp.com/HelloService.wsdl")
+    private Service_Service service;
     public PublishPost(){
         
     }
@@ -41,65 +46,34 @@ public class PublishPost {
         return conn;
     }
     
-    public List<Post> getUnpublishedPost() throws ClassNotFoundException, IllegalAccessException, SQLException{
-        ResultSet result;
-        List<Post> UnpublishedPost = new ArrayList<>();
-        try (Connection conn = getConnection()) {
-            Statement stmt = conn.createStatement();
-            String query = "Select * from post where Status = \"unpublished\"";
-            result = stmt.executeQuery(query);
-            
-            while(result.next()){
-                Post post = new Post();
-                post.setId(result.getString(1));
-                post.setJudul(result.getString(2));
-                post.setTanggal(result.getString(3));
-                post.setContent(result.getString(4));
-                post.setAuthor(result.getString(5));
-                post.setStatus(result.getString(6));
-                UnpublishedPost.add(post);
-            }
-        }
+    public List<service.Post> getUnpublishedPost() throws ClassNotFoundException, IllegalAccessException, SQLException, Exception_Exception{
+        List<service.Post> UnpublishedPost = new ArrayList<>();
+        UnpublishedPost = listPost("unpublished");
         return UnpublishedPost;
     }
     
-    public List<Post> getpublishedPost() throws ClassNotFoundException, IllegalAccessException{
-        ResultSet result;
-        List<Post> publishedPost = new ArrayList<>();
-        try {
-            try (Connection conn = getConnection()) {
-                Statement stmt = conn.createStatement();
-                String query = "Select * from post where Status = \"published\"";
-                result = stmt.executeQuery(query);
-                
-                while(result.next()){
-                    Post post = new Post();
-                    post.setId(result.getString(1));
-                    post.setJudul(result.getString(2));
-                    post.setTanggal(result.getString(3));
-                    post.setContent(result.getString(4));
-                    post.setAuthor(result.getString(5));
-                    post.setStatus(result.getString(6));
-                    publishedPost.add(post);
-                }
-            }
-        } catch (SQLException e) {
-           System.err.println(e);
-        }
+    public List<service.Post> getpublishedPost() throws ClassNotFoundException, IllegalAccessException, Exception_Exception{
+        List<service.Post> publishedPost = new ArrayList<>();
+        publishedPost = listPost("published");
         return publishedPost;
     }
     
-    public void publishPost(int postID) throws ClassNotFoundException, IllegalAccessException{
-        ResultSet result;
-        try {
-            try (Connection conn = getConnection()) {
-                Statement stmt = conn.createStatement();
-                String query = "Update post set Status = \"published\" WHERE ID = " + postID + ";";
-                stmt.executeUpdate(query);
-            }
-        } catch (SQLException e) {
-           System.err.println(e);
-        } 
+    public void publishPost(String postID) throws ClassNotFoundException, IllegalAccessException{
+        changeStatusPost(postID, "published");
+    }
+
+    private java.util.List<service.Post> listPost(java.lang.String status) throws Exception_Exception {
+        // Note that the injected javax.xml.ws.Service reference as well as port objects are not thread safe.
+        // If the calling of port operations may lead to race condition some synchronization is required.
+        service.Service port = service.getServicePort();
+        return port.listPost(status);
+    }
+
+    private boolean changeStatusPost(java.lang.String postId, java.lang.String status) {
+        // Note that the injected javax.xml.ws.Service reference as well as port objects are not thread safe.
+        // If the calling of port operations may lead to race condition some synchronization is required.
+        service.Service port = service.getServicePort();
+        return port.changeStatusPost(postId, status);
     }
     
 }

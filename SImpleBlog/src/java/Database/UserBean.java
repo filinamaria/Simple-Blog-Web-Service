@@ -18,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import service.Exception_Exception;
  
 /**
  *
@@ -29,35 +30,28 @@ public class UserBean implements Serializable{
         public PostingDatabase a = new PostingDatabase();
         private List<User> ListUser;
 
-        public UserBean() throws ClassNotFoundException{
-            try {
-                System.out.println(a.getUsers().toString());
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(UserBean.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SQLException ex) {
-                Logger.getLogger(UserBean.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        public UserBean() throws ClassNotFoundException, Exception_Exception{
         }
 
-        public List<User> getOrderList() throws ClassNotFoundException, SQLException {
+        public List<service.User> getOrderList() throws ClassNotFoundException, SQLException, Exception_Exception {
                 return a.getUsers();
         }
         public void setOrderList(List<User> temp){
             ListUser = temp;
         }
-        public String saveAction() throws ClassNotFoundException, SQLException {
+//        public String saveAction() throws ClassNotFoundException, SQLException, Exception_Exception {
+//
+//                //get all existing value but set "editable" to false 
+//                for (service.User user : a.getUsers()){
+//                        user.setEditable(false);
+//                }
+//                //return to current page
+//                return null;
+//
+//        }
 
-                //get all existing value but set "editable" to false 
-                for (User user : a.getUsers()){
-                        user.setEditable(false);
-                }
-                //return to current page
-                return null;
-
-        }
-
-        public String editAction(User user) {
-                user.setEditable(true);
-                return null;
-        }
+//        public String editAction(User user) {
+//                user.setEditable(true);
+//                return null;
+//        }
 }

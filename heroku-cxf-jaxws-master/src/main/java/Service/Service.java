@@ -9,20 +9,13 @@ package Service;
 import Database.*;
 
 import com.firebase.client.*;
-import com.firebase.client.snapshot.Node;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,14 +23,10 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 import java.util.Date;
 import java.util.Calendar;
-import Database.*;
-import static java.lang.System.console;
+import java.util.logging.Level;
 
 /**
  *
@@ -53,6 +42,8 @@ public class Service {
     /**
      * addPost web service operation
      */
+    
+    
     @WebMethod(operationName = "addPost")
     public boolean addPost(@WebParam(name = "judul") String judul, @WebParam(name = "konten") String konten, @WebParam(name = "tanggal") String tanggal, @WebParam(name = "author") String author) {
         Firebase postReference = ref.child("post");
@@ -85,7 +76,7 @@ public class Service {
                 post.setJudul(result.get(key).get("judul"));
                 post.setContent(result.get(key).get("konten"));
                 post.setTanggal(result.get(key).get("tanggal"));
-                post.setAuthor(result.get(key).get("tanggal"));
+                post.setAuthor(result.get(key).get("author"));
                 post.setStatus(result.get(key).get("status"));
                 posts.add(post);
             }
@@ -190,8 +181,18 @@ public class Service {
      * editUser web service operation
      */
     @WebMethod(operationName = "editUser")
-    public boolean editUser(@WebParam(name = "userId") String userId, @WebParam(name = "password") String password, @WebParam(name = "nama") String nama, @WebParam(name = "email") String email, @WebParam(name = "role") String role) {
-        Firebase userReference = ref.child("user/" + userId);
+    public boolean editUser(@WebParam(name = "username") String username, @WebParam(name = "password") String password, @WebParam(name = "nama") String nama, @WebParam(name = "email") String email, @WebParam(name = "role") String role) throws Exception {
+        String jsonString = readUrl("https://simpleblog5.firebaseio.com/user.json");
+        HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
+        String userid = "";
+        for(String key: result.keySet()){
+            if(result.get(key).get("username").equals(username)){
+                userid = key;
+                break; // tidak perlu menjalankan search lagi karena username bersifat unik
+            }
+        }
+        
+        Firebase userReference = ref.child("user/" + userid);
         Map<String, Object> updatedUser = new HashMap<String, Object>();
         
         if(password != null){
@@ -295,22 +296,26 @@ public class Service {
      * search web service operation
      */
     @WebMethod(operationName = "search")
-    public String search(@WebParam(name = "id") String id) {
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                //System.out.println(snapshot.getValue());
-                var = snapshot.getValue().toString();
-                var = postResults(var);
-                System.out.println("finish");
+    public List<Post> search(@WebParam(name = "katakunci") String katakunci) throws Exception {
+        String jsonString = readUrl("https://simpleblog5.firebaseio.com/post.json");
+        List<Post> posts = new ArrayList<>();
+        
+        HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
+
+        for(String key: result.keySet()){
+            if(result.get(key).get("judul").equals(katakunci) || result.get(key).get("konten").equals(katakunci)){
+                Post post = new Post();
+                post.setId(key);
+                post.setJudul(result.get(key).get("judul"));
+                post.setContent(result.get(key).get("konten"));
+                post.setTanggal(result.get(key).get("tanggal"));
+                post.setAuthor(result.get(key).get("tanggal"));
+                post.setStatus(result.get(key).get("status"));
+                posts.add(post);
             }
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                System.out.println("The read failed: " + firebaseError.getMessage());
-            }
-        });
-        System.out.println("EXIT");
-        return var+" PING";
+        }
+        
+        return posts;
     }
     
     public String postResults(String data){
@@ -335,6 +340,10 @@ public class Service {
         }
     }
     
+    /**
+     * login web service operation
+     */
+      @WebMethod(operationName = "login")
       public boolean login(@WebParam(name = "username") String username,@WebParam(name = "password") String password) throws Exception {
         String jsonString = readUrl("https://simpleblog5.firebaseio.com/user.json");
         boolean isfound = false;
@@ -342,8 +351,6 @@ public class Service {
 
         for(String key: result.keySet()){
             if(result.get(key).get("username").equals(username) && result.get(key).get("password").equals(password)){
-                String user = result.get(key).get("username");
-                String pswd = result.get(key).get("password");
                 isfound = true;
                 break;
             }
@@ -351,5 +358,150 @@ public class Service {
         
         return isfound;
     }
+      
+	/**
+     * getAuthorPost web service operation
+     */
+    @WebMethod(operationName = "getAuthorPost")
+    public List<Post> getAuthorPost(@WebParam(name = "author") String author) throws Exception {
+        String jsonString = readUrl("https://simpleblog5.firebaseio.com/post.json");
+        List<Post> posts = new ArrayList<>();
+        HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
+
+        for(String key: result.keySet()){
+            if(result.get(key).get("author").equals(author) && result.get(key).get("status").equals("published")){
+                Post post = new Post();
+                post.setId(key);
+                post.setJudul(result.get(key).get("judul"));
+                post.setContent(result.get(key).get("konten"));
+                post.setTanggal(result.get(key).get("tanggal"));
+                post.setAuthor(result.get(key).get("author"));
+                post.setStatus(result.get(key).get("status"));
+                posts.add(post);
+            }
+        }
         
+        return posts;
+    }
+	/**
+     * getUserRole web service operation
+     */
+    @WebMethod(operationName = "getUserRole")
+    public String getUserRole(@WebParam(name = "username") String username) throws Exception {
+        String jsonString = readUrl("https://simpleblog5.firebaseio.com/user.json");
+        HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
+        String role = "Role not found";
+        for(String key: result.keySet()){
+            if(result.get(key).get("username").equals(username)){
+                role=result.get(key).get("role");
+                break;
+            }
+        }
+        return role;
+    }
+	/**
+     * ChangeStatusPost web service operation
+     */
+    @WebMethod(operationName = "ChangeStatusPost")
+    public boolean ChangeStatusPost(@WebParam(name = "postId") String postId, @WebParam(name = "status") String status) {
+        Firebase postReference = ref.child("post/" + postId);
+        Map<String, Object> updatedPost = new HashMap<String, Object>();
+        
+        updatedPost.put("status", status);
+        
+        postReference.updateChildren(updatedPost);
+        
+        return true;
+    }
+	
+    /**
+     * deleteRealPost web service operation
+     */
+    @WebMethod(operationName = "deleteRealPost")
+    public boolean deleteRealPost(@WebParam(name = "postId") String postId) {
+        Firebase postReference = ref.child("post/" + postId);       
+        postReference.removeValue();
+        return true;
+    }
+    
+    /**
+     * checkuserexist web service operation
+     */
+    @WebMethod(operationName = "checkuserexist")
+    public int checkuserexist(@WebParam(name = "username") String username, @WebParam(name = "password") String password) throws Exception {
+        String jsonString = readUrl("https://simpleblog5.firebaseio.com/user.json");
+        HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
+        for(String key: result.keySet()){
+            if(result.get(key).get("username").equals(username) && result.get(key).get("password").equals(password)){
+                return 1;// tidak perlu menjalankan search lagi karena username bersifat unik
+            }
+        }
+        
+        return 0;
+    }
+    
+    /**
+     * getnama web service operation
+     */
+    @WebMethod(operationName = "getnama")
+    public String getnama(@WebParam(name = "username") String username) throws Exception {
+        String jsonString = readUrl("https://simpleblog5.firebaseio.com/user.json");
+        HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
+        String nama = "Failed to get Nama";
+        for(String key: result.keySet()){
+            if(result.get(key).get("username").equals(username)){
+                nama = result.get(key).get("nama");
+                break; // tidak perlu menjalankan search lagi karena username bersifat unik
+            }
+        }
+        
+        return nama;
+    }
+    
+    /**
+     * getemail web service operation
+     */
+    @WebMethod(operationName = "getemail")
+    public String getemail(@WebParam(name = "username") String username) throws Exception {
+        String jsonString = readUrl("https://simpleblog5.firebaseio.com/user.json");
+        HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
+        String email = "Failed to get email";
+        for(String key: result.keySet()){
+            if(result.get(key).get("username").equals(username)){
+                email = result.get(key).get("email");
+                break; // tidak perlu menjalankan search lagi karena username bersifat unik
+            }
+        }
+        
+        return email;
+    }
+    
+        /**
+     * getPost web service operation
+     */
+    public Post getPost(@WebParam(name = "postid") String postid) throws Exception {
+        String jsonString = readUrl("https://simpleblog5.firebaseio.com/post.json");
+        HashMap<String, Map<String, String>> result = new ObjectMapper().readValue(jsonString, HashMap.class);
+        Post post = new Post();
+        
+        for(String key: result.keySet()){
+            System.out.println("The key is : "+key);
+            if(key.equals(postid)){
+                post.setId(key);
+                post.setJudul(result.get(key).get("judul"));
+                post.setContent(result.get(key).get("konten"));
+                post.setTanggal(result.get(key).get("tanggal"));
+                post.setAuthor(result.get(key).get("author"));
+                post.setStatus(result.get(key).get("status"));
+                System.out.println("key : "+key);
+                System.out.println("konten : "+post.getContent());
+                break; // key bersifat unik yang merupakan hasil generate dari firebase sendiri.
+            }
+            
+        }
+        
+        return post;
+    }
+
+
 }

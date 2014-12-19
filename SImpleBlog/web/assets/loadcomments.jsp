@@ -22,6 +22,7 @@
             ResultSet result = stmt.executeQuery(query);
             while(result.next()){
                 String name = result.getString("Nama");
+                
                 String comment = result.getString("Komentar");
                 String date = result.getString("Tanggal");
                 out.println("<li class=\"art-list-item\">");
@@ -38,7 +39,28 @@
         }catch(Exception ex){
             System.out.println("cannot connect to database");
         }
-    } 
-    
-    
+   
+//    try {
+//	service.Service_Service service = new service.Service_Service();
+//	service.Service port = service.getServicePort();
+//	 // TODO initialize WS operation arguments here
+//	java.lang.String id = request.getParameter("ID");
+//	java.lang.String nama = "";
+//	java.lang.String email = "";
+//	java.lang.String komentar = "";
+//                out.println("<li class=\"art-list-item\">");
+//		out.println("<div class=\"art-list-item-title-and-time\">");
+//		out.println("<h2 class=\"art-list-title\">" + nama +"</h2>");
+////		out.println("<div class=\"art-list-time\">" + date + "</div>");
+//		out.println("</div>");
+//		out.println("<p>");
+//		out.println(komentar);
+//		out.println("</p>");
+//		out.println("</li>");
+//	java.lang.String result = port.addComment(id, nama, email, komentar);
+//	out.println("Result = "+result);
+//    } catch (Exception ex) {
+//	// TODO handle custom exceptions here
+//        }
+    }
 %>
